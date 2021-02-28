@@ -31,9 +31,8 @@ def button_equal(equation):
 #The Buttons
 e = Entry(root) #A widget that enters things
 e.grid(row = 0, column = 0, columnspan = 3, padx = 10, pady = 10)
-CalculatorButtonAllClear = Button (root, text = "AC", padx = 10, pady = 10, command = button_clear)
 CalculatorButtonClear = Button (root, text = "C", padx = 10, pady = 10, command = button_clear)
-CalculatorButtonNegative = Button (root, text = "+/-", padx = 10, pady = 10)
+CalculatorButtonNegative = Button (root, text = "-N", padx = 10, pady = 10, command = lambda: button_click("-"))
 CalculatorButtonDivide = Button (root, text = "/", padx = 10, pady = 10, command =lambda: button_click("/"))
 CalculatorButtonOne = Button (root, text = "1", padx = 10, pady = 10, command = lambda: button_click(1))
 CalculatorButton2 = Button (root, text = "2", padx = 10, pady = 10, command = lambda: button_click(2))
@@ -53,15 +52,15 @@ CalculatorButtonEquals = Button (root, text = "=", padx = 10, pady = 10, command
 
 # Parentsies. I don't know where to put them yet
 CalculatorButtonPar1 = Button (root, text = "(", padx = 10, pady = 10, command = lambda: button_click( "(" ) )
-CalculatorButtonPar1 = Button (root, text = ")", padx = 10, pady = 10, command =lambda: button_click( ")" ) )
+CalculatorButtonPar2 = Button (root, text = ")", padx = 10, pady = 10, command =lambda: button_click( ")" ) )
 
 
 #To Place Them
 
 #Math.grid(row = 0, column = 1)
-CalculatorButtonAllClear.grid(row = 1, column = 0)
-CalculatorButtonClear.grid(row = 1, column = 1)
-CalculatorButtonNegative.grid(row = 1, column = 2)
+CalculatorButtonClear.grid(row = 1, column = 0)
+CalculatorButtonPar1.grid(row = 1, column = 1)
+CalculatorButtonPar2.grid(row = 1, column = 2)
 CalculatorButtonDivide.grid(row = 1, column = 3)
 CalculatorButton7.grid(row = 2, column = 0)
 CalculatorButton8.grid(row = 2, column = 1)
@@ -77,6 +76,7 @@ CalculatorButton3.grid(row = 4, column = 2)
 CalculatorButtonAdd.grid(row = 4, column = 3)
 CalculatorButton0.grid(row = 5, column = 0)
 CalculatorButtonDecimal.grid(row = 5, column = 1)
+CalculatorButtonNegative.grid(row = 5, column = 2)
 CalculatorButtonEquals.grid(row = 5, column = 3)
 
 

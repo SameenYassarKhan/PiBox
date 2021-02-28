@@ -15,7 +15,10 @@ def button_clear():
 	e.delete(0, END)
 
 def button_equal(equation):
-	answer = eval(equation)
+	answer = eval(equation) #Evaluates the answer
+	check_answer = isinstance(answer, float) #checks if the answer is a float
+	if check_answer is True and answer.is_integer(): #If it is, and the float is an inter like 9.0,
+		answer = int(answer) #Then the float is converted to an interget like 9
 	e.delete(0,END)
 	e.insert (0, answer)
 

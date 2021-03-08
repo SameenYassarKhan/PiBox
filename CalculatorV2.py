@@ -33,7 +33,7 @@ def button_equal(equation):
 
 #The Buttons
 e = Entry(root) #A widget that enters things
-e.grid(row = 0, column = 0, columnspan = 3, padx = 10, pady = 10)
+e.grid(row = 0, column = 0, columnspan = 4, padx = 10, pady = 10)
 CalculatorButtonClear = Button (root, text = "C", padx = 10, pady = 10, command = button_clear)
 CalculatorButtonNegative = Button (root, text = "-N", padx = 10, pady = 10, command = lambda: button_click("-"))
 CalculatorButtonDivide = Button (root, text = "/", padx = 10, pady = 10, command =lambda: button_click("/"))

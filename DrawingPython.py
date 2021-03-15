@@ -8,7 +8,7 @@ from kivy.uix.widget import Widget
 
 from kivy.uix.relativelayout import RelativeLayout
 
-class Paint_brush(Widget)
+class Paint_brush(Widget):
 	pass
 
 class Drawing(RelativeLayout):
@@ -21,7 +21,7 @@ class Drawing(RelativeLayout):
 		pb.center = touch.pos
 		self.add_widget(pb)
 class DrawingApp(App):
-	def build(self)
+	def build(self):
 		return(Drawing)
 
 DrawingApp().run()

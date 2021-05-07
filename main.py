@@ -1,5 +1,9 @@
+import os
+import smtplib
+from ast import literal_eval
 from tkinter import *
 from tkinter import filedialog
+from tkinter.filedialog import asksaveasfile
 from tkinter.font import Font
 from tkinter.ttk import *
 from PIL import ImageTk, Image
@@ -7,8 +11,13 @@ import random
 from bs4 import BeautifulSoup
 import requests
 from tkinter import ttk, colorchooser
-import time
+import matplotlib
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
+matplotlib.use("TkAgg")
+
+import time
 
 """
 --------------------------------
@@ -271,6 +280,35 @@ def open_grapher_frame():
     lf_grapher_frame = LabelFrame(root, text="Grapher")
     lf_grapher_frame.place_configure(in_=root, relx=0.5, rely=0.1, height=510, width=900, anchor=N)
 
+    entry_box = Entry(lf_grapher_frame, justify='center', width=20)
+    entry_box.place(x=85, y=60)
+
+    def regular_plotting():
+        figure = Figure(figsize=(5, 5), dpi=100)
+        graph = figure.add_subplot(111)
+        graph.plot(literal_eval(entry_box.get()))
+
+        graphing_canvas = FigureCanvasTkAgg(figure, master=lf_grapher_frame)
+        graphing_canvas.draw()
+        graphing_canvas.get_tk_widget().place(x=400, y=0)
+
+        nav_toolbar = NavigationToolbar2Tk(graphing_canvas, lf_grapher_frame)
+        nav_toolbar.update()
+        graphing_canvas._tkcanvas.place(x=400,y=0)
+
+    lbl_tools_word = Label(lf_grapher_frame, text="______________\n         Tools\n______________")
+    lbl_tools_word.place(x=125, y=0)
+
+    lbl_regular_plotting_ie = Label(lf_grapher_frame, text="Play with coordinates!")
+    lbl_regular_plotting_ie.place(x=110, y=100)
+
+    btn_regular_plot = Button(lf_grapher_frame, width=10, text="X/Y Plot", command=regular_plotting)
+    btn_regular_plot.place(x=115, y=120)
+
+    btn_exit = Button(lf_grapher_frame, width=10, text="Exit", command=lf_grapher_frame.destroy)
+    btn_exit.place(x=115, y=150)
+
+
 
 """
 --------------------------------
@@ -381,6 +419,179 @@ def open_todo_frame():
 
 """
 --------------------------------
+Documentation Application
+--------------------------------
+"""
+
+
+def open_documentation_frame():
+    lf_documentation_frame = LabelFrame(root, text="Documentation")
+    lf_documentation_frame.place_configure(in_=root, relx=0.5, rely=0.1, height=700, width=900, anchor=N)
+
+    dfd_file = "MyComputer/Important/DFD1.png"
+    img_dfd = ImageTk.PhotoImage(
+        Image.open(dfd_file).resize((
+            300, 300), Image.ANTIALIAS))
+    lbl_dfd = Label(lf_documentation_frame, image=img_dfd)
+    lbl_dfd.place(x=0,y=0)
+    # dfd_canvas = Canvas(lf_documentation_frame)
+    # dfd_canvas.pack(fill="both", expand=True)
+    #
+    # dfd_canvas.create_image(0, 0, image=img_dfd, anchor="nw")
+
+    # img_dfd = ImageTk.PhotoImage("MyComputer/Important/DFD1.png").resize((
+    #         root.winfo_screenwidth(), root.winfo_screenheight()), Image.ANTIALIAS))
+    # lbl_dfd_insert = Label(root, image=img_dfd)
+    # lbl_dfd_insert.pack()
+
+
+"""
+--------------------------------
+Email Application
+--------------------------------
+"""
+
+
+def open_email_frame():
+    lf_email_frame = LabelFrame(root, text="Email")
+    lf_email_frame.place_configure(in_=root, relx=0.5, rely=0.1, height=510, width=900, anchor=N)
+
+    emailaddressvalue = StringVar()
+    passwordvalue = StringVar()
+    recipientvalue = StringVar()
+    subjectvalue = StringVar()
+    bodyvalue = StringVar()
+
+    lf_sub_frame = LabelFrame(lf_email_frame, text="Main Page")
+    lf_sub_frame.place_configure(in_=lf_email_frame, relx=0.6, rely=0, height=485, width=600, anchor=N)
+
+    lbl_image = Label(lf_email_frame, text="______________\n       Services\n______________")
+    lbl_image.place(x=60, y=0)
+
+    def sendtooutlook(recipient, mail):
+        emailaddress = emailaddressvalue.get()
+        password = passwordvalue.get()
+        subject = subjectvalue.get()
+
+        message = 'Subject: {}\n\n{}'.format(subject, mail)
+
+        server = smtplib.SMTP('smtp-mail.outlook.com', 465)
+        server.starttls()
+        server.login(emailaddress, password)
+        server.sendmail(emailaddress, recipient, message)
+        server.quit()
+
+    def sendtogmail(recipient, mail):
+        emailaddress = emailaddressvalue.get()
+        password = passwordvalue.get()
+        subject = subjectvalue.get()
+
+        message = 'Subject: {}\n\n{}'.format(subject, mail)
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(emailaddress, password)
+        server.sendmail(emailaddress, recipient, message)
+        server.quit()
+
+    def composeoutlookmessage():
+        newWindow = Toplevel(lf_sub_frame)
+        newWindow.title("Compose Message")
+        newWindow.geometry("400x400")
+        newWindow.resizable(0, 0)
+
+        to = Label(newWindow, text="To:", font=('Times New Roman', 20)).grid(row=1, column=0)
+        recipientfield = Entry(newWindow, textvariable=recipientvalue)
+        recipientfield.grid(row=1, column=1)
+
+        subject = Label(newWindow, text="Subject:", font=('Times New Roman', 20)).grid(row=4, column=0)
+        subjectfield = Entry(newWindow, textvariable=subjectvalue)
+        subjectfield.grid(row=4, column=1)
+
+        body = Text(newWindow, height=16, width=32)
+        body.grid(row=6, column=1)
+
+        sendbutton = Button(newWindow, text='Send',
+                            command=lambda: sendtooutlook(recipientfield.get(), body.get("1.0", END))).grid(row=7,
+                                                                                                            column=0)
+
+    def composegmailmessage():
+        newWindow = Toplevel(lf_sub_frame)
+        newWindow.title("Compose Message")
+        newWindow.geometry("400x400")
+        newWindow.resizable(0, 0)
+
+        to = Label(newWindow, text="To:", font=('Times New Roman', 20)).grid(row=1, column=0)
+        recipientfield = Entry(newWindow, font=('Times New Roman', 20), textvariable=recipientvalue)
+        recipientfield.grid(row=1, column=1)
+
+        subject = Label(newWindow, text="Subject:", font=('Times New Roman', 20)).grid(row=4, column=0)
+        subjectfield = Entry(newWindow, font=('Times New Roman', 20), textvariable=subjectvalue)
+        subjectfield.grid(row=4, column=1)
+
+        body = Text(newWindow, height=16, width=32)
+        body.grid(row=6, column=1)
+
+        sendbutton = Button(newWindow, text='Send',
+                            command=lambda: sendtogmail(recipientfield.get(), body.get("1.0", END))).grid(row=7,
+                                                                                                          column=0)
+
+    def outlooklogin():
+        newWindow = Toplevel(lf_sub_frame)
+        newWindow.title("Sign in to Outlook")
+        newWindow.geometry("400x470")
+        newWindow.resizable(0, 0)
+
+        outlookpic = PhotoImage(file="MyComputer/Login/Email/outlook.png")
+        outlooklogo = outlookpic.subsample(3, 3)
+        outlook = Label(newWindow, image=outlooklogo)
+        outlook.image = outlooklogo
+        outlook.pack()
+
+        Label(newWindow, text="").pack()
+
+        Label(newWindow, text="Email:", font=('Times New Roman', 20)).pack()
+        emailfield = Entry(newWindow, font=('Times New Roman', 20), textvariable=emailaddressvalue).pack()
+        Label(newWindow, text="").pack()
+        Label(newWindow, text="Password:", font=('Times New Roman', 20)).pack()
+        passwordfield = Entry(newWindow, show="*", font=('Times New Roman', 20), textvariable=passwordvalue).pack()
+        Label(newWindow, text="").pack()
+        signin = Button(newWindow, text='Sign in', command=composeoutlookmessage).pack()
+
+    def gmaillogin():
+        newWindow = Toplevel(lf_sub_frame)
+        newWindow.title("Sign in to Gmail")
+        newWindow.geometry("420x400")
+        newWindow.resizable(0, 0)
+
+        googlepic = PhotoImage(file="MyComputer/Login/Email/google.png")
+        googlelogo = googlepic.subsample(4, 4)
+        google = Label(newWindow, image=googlelogo)
+        google.image = googlelogo
+        google.pack()
+
+        Label(newWindow, text="").pack()
+
+        Label(newWindow, text="Email:", font=('Times New Roman', 20)).pack()
+        emailfield = Entry(newWindow, font=('Times New Roman', 20), textvariable=emailaddressvalue).pack()
+        Label(newWindow, text="").pack()
+        Label(newWindow, text="Password:", font=('Times New Roman', 20)).pack()
+        passwordfield = Entry(newWindow, show="*", font=('Times New Roman', 20), textvariable=passwordvalue).pack()
+        Label(newWindow, text="").pack()
+        signin = Button(newWindow, text='Sign in', command=composegmailmessage).pack()
+
+    btn_gmail = Button(lf_email_frame, width=10, text="GMAIL", command=gmaillogin)
+    btn_gmail.place(x=55, y=55)
+
+    btn_exit = Button(lf_email_frame, width=10, text="Exit", command=lf_email_frame.destroy)
+    btn_exit.place(x=55, y=130)
+
+    btn_outlook = Button(lf_email_frame, width=10, text="OUTLOOK", command=outlooklogin)
+    btn_outlook.place(x=55, y=80)
+
+
+"""
+--------------------------------
 Calculator Application
 --------------------------------
 """
@@ -388,11 +599,181 @@ Calculator Application
 
 def open_calculator_frame():
     lf_calculator_frame = LabelFrame(root, text="Calculator")
-    lf_calculator_frame.place_configure(in_=root, relx=1, rely=1, height=510, width=900, anchor=N)
+    lf_calculator_frame.place_configure(in_=root, relx=0.5, rely=0.3, height=200, width=315, anchor=N)
+
+    # This is not additon. This just makes the button do things
+
+    # Defining what the buttons do.
+    def button_click(n):
+        e.insert(END, n)
+
+    def button_clear():
+        e.delete(0, END)
+
+    def button_equal(equation):
+        answer = eval(equation)  # Evaluates the answer
+        check_answer = isinstance(answer, float)  # checks if the answer is a float
+        if check_answer is True and answer.is_integer():  # If it is, and the float is an inter like 9.0,
+            answer = int(answer)  # Then the float is converted to an interget like 9
+        e.delete(0, END)
+        e.insert(0, answer)
+
+    # Subtraction
+    # Multiplication
+    # Division
+    # Changing the function from positive to negative
+    # Clear
+    # Clear all (do I actually need this?)
+
+    # The Buttons
+    e = Entry(lf_calculator_frame)  # A widget that enters things
+    e.grid(row=0, column=0, columnspan=4)
+    CalculatorButtonClear = Button(lf_calculator_frame, text="C", width=5, command=button_clear)
+    CalculatorButtonNegative = Button(lf_calculator_frame, text="-N", width=5, command=lambda: button_click("-"))
+    CalculatorButtonDivide = Button(lf_calculator_frame, text="/", width=5, command=lambda: button_click("/"))
+    CalculatorButtonOne = Button(lf_calculator_frame, text="1", width=5, command=lambda: button_click(1))
+    CalculatorButton2 = Button(lf_calculator_frame, text="2", width=5, command=lambda: button_click(2))
+    CalculatorButton3 = Button(lf_calculator_frame, text="3", width=5, command=lambda: button_click(3))
+    CalculatorButtonMultiply = Button(lf_calculator_frame, text="*", width=5, command=lambda: button_click("*"))
+    CalculatorButton4 = Button(lf_calculator_frame, text="4", width=5, command=lambda: button_click(4))
+    CalculatorButton5 = Button(lf_calculator_frame, text="5", width=5, command=lambda: button_click(5))
+    CalculatorButton6 = Button(lf_calculator_frame, text="6", width=5, command=lambda: button_click(6))
+    CalculatorButtonMinus = Button(lf_calculator_frame, text="-", width=5, command=lambda: button_click("-"))
+    CalculatorButton7 = Button(lf_calculator_frame, text="7", width=5, command=lambda: button_click(7))
+    CalculatorButton8 = Button(lf_calculator_frame, text="8", width=5, command=lambda: button_click(8))
+    CalculatorButton9 = Button(lf_calculator_frame, text="9", width=5, command=lambda: button_click(9))
+    CalculatorButtonAdd = Button(lf_calculator_frame, text="+", width=5, command=lambda: button_click("+"))
+    CalculatorButton0 = Button(lf_calculator_frame, text="0", width=5, command=lambda: button_click(0))
+    CalculatorButtonDecimal = Button(lf_calculator_frame, text=".", width=5, command=lambda: button_click("."))
+    CalculatorButtonEquals = Button(lf_calculator_frame, text="=", width=5, command=lambda: button_equal(e.get()))
+
+    # Parentsies. I don't know where to put them yet
+    CalculatorButtonPar1 = Button(lf_calculator_frame, text="(", width=5, command=lambda: button_click("("))
+    CalculatorButtonPar2 = Button(lf_calculator_frame, text=")", width=5, command=lambda: button_click(")"))
+
+    # To Place Them
+
+    # Math.grid(row = 0, column = 1)
+    CalculatorButtonClear.grid(row=1, column=0)
+    CalculatorButtonPar1.grid(row=1, column=1)
+    CalculatorButtonPar2.grid(row=1, column=2)
+    CalculatorButtonDivide.grid(row=1, column=3)
+    CalculatorButton7.grid(row=2, column=0)
+    CalculatorButton8.grid(row=2, column=1)
+    CalculatorButton9.grid(row=2, column=2)
+    CalculatorButtonMultiply.grid(row=2, column=3)
+    CalculatorButton4.grid(row=3, column=0)
+    CalculatorButton5.grid(row=3, column=1)
+    CalculatorButton6.grid(row=3, column=2)
+    CalculatorButtonMinus.grid(row=3, column=3)
+    CalculatorButtonOne.grid(row=4, column=0)
+    CalculatorButton2.grid(row=4, column=1)
+    CalculatorButton3.grid(row=4, column=2)
+    CalculatorButtonAdd.grid(row=4, column=3)
+    CalculatorButton0.grid(row=5, column=0)
+    CalculatorButtonDecimal.grid(row=5, column=1)
+    CalculatorButtonNegative.grid(row=5, column=2)
+    CalculatorButtonEquals.grid(row=5, column=3)
+
+    btn_leave = Button(lf_calculator_frame, width=30, text="Quit", command=lf_calculator_frame.destroy)
+    btn_leave.grid(row=6, column=0, columnspan=4)
+
+"""
+--------------------------------
+Slides Application
+--------------------------------
+"""
+
+def open_slides_frame():
+    sub_window = Toplevel()
+    sub_window.title("Slides")
+    sub_window.geometry(f'{root.winfo_screenwidth()}x{root.winfo_screenheight()}')
+
+    # img_1 = ImageTk.PhotoImage(file="MyComputer/Important/Slides/agenda.png").resize((450, 350), Image. ANTIALIAS)
+    img_obj_1 = Image.open("MyComputer/Important/Slides/agenda.png").resize(
+        (root.winfo_screenwidth()-210, root.winfo_screenheight()-210), Image. ANTIALIAS)
+    img_1 = ImageTk.PhotoImage(img_obj_1)
+
+    img_obj_2 = Image.open("MyComputer/Important/Slides/app_man.png").resize(
+        (root.winfo_screenwidth()-210, root.winfo_screenheight()-210), Image.ANTIALIAS)
+    img_2 = ImageTk.PhotoImage(img_obj_1)
+
+    img_obj_3 = Image.open("MyComputer/Important/Slides/calc.png").resize(
+        (root.winfo_screenwidth()-210, root.winfo_screenheight()-210), Image.ANTIALIAS)
+    img_3 = ImageTk.PhotoImage(img_obj_1)
+
+    img_obj_4 = Image.open("MyComputer/Important/Slides/dfd0.png").resize(
+        (root.winfo_screenwidth()-210, root.winfo_screenheight()-210), Image.ANTIALIAS)
+    img_4 = ImageTk.PhotoImage(img_obj_1)
+
+    img_list_slides = [img_1, img_2, img_3, img_4]
+
+    lbl_current_slide = Label(sub_window, image=img_3)
+    lbl_current_slide.pack()
+
+    slide_count = 0
+
+    def forward():
+        lbl_current_slide.forget()
+        lbl_current_slide["image"] = img_2
+        lbl_current_slide.pack()
+
+    # img_list_slides = [img_1, img_2, img_3, img_4]
+    #
+    # current_slide = Canvas(sub_window, width=root.winfo_screenwidth() - 220, height=root.winfo_screenheight() - 200,
+    #                        bg='black')
+    # current_slide.place(x=100, y=80)
+    # current_slide.create_image(0, 0, image=img_list_slides[0], anchor=NW)
+    #
+    # slide_count = 0
+    # def forward(slide_count):
+    #     slide_count
+    #     if slide_count >= len(img_list_slides):
+    #         slide_count = 1
+    #     else:
+    #         slide_count += 1
+    #     current_slide.delete("all")
+    #     # current_slide["image"] = img_list_slides[slide_count]
+    #     current_slide.itemconfig(0, image=img_list_slides[slide_count])
+
+
+    def backward():
+        pass
+    #     slide_count = 1
+    #     current_slide = Canvas(sub_window, width=300, height=200, bg='black')
+    #     current_slide.pack(expand=YES, fill=BOTH)
+    #     current_slide.create_image(2, 0, image=img_slides[2], anchor=NW)
+
+    btn_next = Button(sub_window, width=10, text=">>>>>>>", command=forward)
+    btn_next.place(x=1100, y=50)
+    #
+    btn_previous = Button(sub_window, width=10, text="<<<<<<<", command=backward)
+    btn_previous.place(x=700, y=50)
+
+
+    sub_window.mainloop()
+
+
+
+
+"""
+--------------------------------
+My Computer Application
+--------------------------------
+"""
+
+
+def open_my_computer_frame():
+    filename = filedialog.askopenfilename(initialdir="/",
+                                          title="Select a File",
+                                          filetypes=(("Text files",
+                                                      "*.txt*"),
+                                                     ("all files",
+                                                      "*.*")))
 
 
 lf_appTray = LabelFrame(root, text="________________\nAPPLICATION TRAY\n________________")
-btn_documentation = Button(lf_appTray, width=10, text="About PIBox", command=open_browsing_frame)
+btn_documentation = Button(lf_appTray, width=10, text="About PIBox", command=open_documentation_frame)
 btn_documentation.pack()
 
 lf_appTray.place(in_=root, relx=1, rely=1, height=root.winfo_screenheight(), width=150, anchor=SE)
@@ -412,10 +793,10 @@ btn_todo.pack()
 btn_sticky_note = Button(lf_appTray, width=10, text="Sticky Note", command=open_notepad_frame)
 btn_sticky_note.pack()
 
-btn_settings = Button(lf_appTray, width=10, text="Settings")
-btn_settings.pack()
+btn_slides = Button(lf_appTray, width=10, text="Slides", command=open_slides_frame)
+btn_slides.pack()
 
-btn_email = Button(lf_appTray, width=10, text="Email")
+btn_email = Button(lf_appTray, width=10, text="Email", command=open_email_frame)
 btn_email.pack()
 
 btn_drawing = Button(lf_appTray, width=10, text="Drawing", command=open_drawing_frame)
@@ -424,11 +805,11 @@ btn_drawing.pack()
 btn_calculator = Button(lf_appTray, width=10, text="Calculator", command=open_calculator_frame)
 btn_calculator.pack()
 
-btn_my_computer = Button(lf_appTray, width=10, text="My Computer")
+btn_my_computer = Button(lf_appTray, width=10, text="My Computer", command=open_my_computer_frame)
 btn_my_computer.pack()
 
-btn_drawing = Button(lf_appTray, width=10, text="Quit", command=root.quit)
-btn_drawing.pack()
+btn_quit = Button(lf_appTray, width=10, text="Quit", command=root.quit)
+btn_quit.pack()
 
 # New Window Format
 # new_label = LabelFrame(root)
